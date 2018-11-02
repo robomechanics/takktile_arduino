@@ -35,17 +35,24 @@ s.ReadAsyncMode = 'continuous';
 readasync(s);
 
 num_sensors = 5;
+pressure_threshold = 1; %ksi to register as contact
 
 %% Plotting
 figure
-plot_every = 20;
+plot_every = 30;
 gauge_pressure_values = zeros(num_sensors, 1);
 b = bar(gauge_pressure_values)
+hold on
 title('Pressure Values')
 xlabel('Sensor Index')
 ylabel('Pressure (ksi)')
 ylim([0, 50])
 b.YDataSource = 'gauge_pressure_values';
+x_location = [0 0];
+p = plot(x_location, ylim, 'r');
+hold off
+p.XDataSource = ('x_location');
+
 
 %% Calibration
 num_calibration_samples = 100;
@@ -76,7 +83,11 @@ for i=1:10000
             continue;
         end
         gauge_pressure_values = absolute_pressure_values - calibrated_zeroes
+        gauge_pressure_values(gauge_pressure_values < 0) = 0;
+        [location, pressure_norm] = localize(gauge_pressure_values, pressure_threshold);
+        location
         if (mod(i, plot_every) == 0)
+            x_location = [location location]
             refreshdata
             drawnow
         end
