@@ -1,18 +1,25 @@
 #!/usr/bin/env python
-import serial, time
+import serial
+import time
+print ("Hello")
+
+i=0
 try:
-    i=0
-    arduino = serial.Serial('/dev/tty.usbmodem1411', 9600)
-    print "Connection successful"
-    while True:
-        data = arduino.readline()
-        if data:
-            try:
-                values = [float(j) for j in data.split(" ") if len(j) > 2]
-                print values
-            except ValueError:
-                print "invalid string:"
-                print data
-            i+=1
+    arduino = serial.Serial('/dev/tty.usbmodem14101', 115200, timeout = 1)
 except:
-    "Connection failed"
+    print("Connection failed")
+print("Connection successful")
+while True:
+    data = arduino.readline()
+    if data:
+        try:
+            string_values = data.split(",")
+            absolute_pressure_floats = []
+            for i in range(len(string_values)):
+                absolute_pressure_floats.append(float(string_values[i].translate(None, "[] ")))
+            print (absolute_pressure_floats)
+        except ValueError:
+            print("invalid string:")
+            print(data)
+        i+=1
+

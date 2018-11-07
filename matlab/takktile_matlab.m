@@ -22,7 +22,7 @@ clear all; close all;
 instrreset
 % s = serial('COM5'); % for windows
 % s = serial('/dev/ttyACM0'); % for ubuntu
-s = serial('/dev/tty.usbmodem14201');
+s = serial('/dev/tty.usbmodem14101');
 
 set(s,'Baudrate',115200);
 set(s,'DataBits', 8);
@@ -39,7 +39,7 @@ pressure_threshold = 1; %ksi to register as contact
 
 %% Plotting
 figure
-plot_every = 30;
+plot_every = 50;
 gauge_pressure_values = zeros(num_sensors, 1);
 b = bar(gauge_pressure_values)
 hold on
@@ -84,14 +84,17 @@ for i=1:10000
         end
         gauge_pressure_values = absolute_pressure_values - calibrated_zeroes
         gauge_pressure_values(gauge_pressure_values < 0) = 0;
-        [location, pressure_norm] = localize(gauge_pressure_values, pressure_threshold);
-        location
+        
         if (mod(i, plot_every) == 0)
-            x_location = [location location]
+            [location, pressure_norm] = localize(gauge_pressure_values, pressure_threshold);
+            location
+            toc
+            x_location = [location location];
             refreshdata
             drawnow
         end
-        toc
+        
+        
 end
 %% ----
 
